@@ -1,5 +1,5 @@
 import joi from "joi";
-import { db } from "../db/mongodb";
+import { db } from "../db/mongodb.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -11,7 +11,7 @@ export async function registerPoll(req, res) {
 
   const poll = req.body;
 
-  const { error } = registerSchema(poll);
+  const { error } = registerSchema.validate(poll);
 
   if (error) {
     return res.status(422).send("Não está no formato correto");
