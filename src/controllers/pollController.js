@@ -18,17 +18,17 @@ export async function registerPoll(req, res) {
     return res.status(422).send(`"Não está no formato correto" ${error}`);
   }
 
-  try {
+  /* try {
     const pollExists = await db
       .collection("polls")
       .findOne({ title: poll.title });
 
     if (pollExists) {
-      return res.status(401).send("Poll exists!!");
+      return res.status(409).send("Poll exists!!");
     }
   } catch (error) {
     res.sendStatus(500);
-  }
+  } */
 
   if (!poll.expireAt || poll.expireAt === "") {
     const dt = daysjs().add(30, "day").format("YYYY-MM-DD 23:59");
