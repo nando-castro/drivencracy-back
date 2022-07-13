@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { registerPoll } from "../controllers/pollController.js";
+import { getPoll, registerPoll } from "../controllers/pollController.js";
 
 const router = Router();
 
 router.post("/poll", registerPoll);
 router.post("/choice");
 
-router.get("/poll");
+router.get("/poll", getPoll);
 
 export default router;

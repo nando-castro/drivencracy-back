@@ -1,8 +1,7 @@
 import joi from "joi";
-import { db } from "../db/mongodb.js";
+import { db, objectId } from "../db/mongodb.js";
 import dotenv from "dotenv";
 import daysjs from "dayjs";
-import dayjs from "dayjs";
 dotenv.config();
 
 export async function registerPoll(req, res) {
@@ -50,4 +49,10 @@ export async function registerPoll(req, res) {
   } catch (error) {
     res.sendStatus(500);
   }
+}
+
+export async function getPoll(req, res) {
+  const polls = await db.collection("polls").find().toArray();
+
+  res.send(polls);
 }
