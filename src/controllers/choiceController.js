@@ -59,16 +59,41 @@ export async function getChoice(req, res) {
   const { id } = req.params;
 
   try {
-    const pollsExists = await db
+    const pollExists = await db
       .collection("polls")
       .findOne({ _id: objectId(id) });
-    if (!pollsExists) {
+    if (!pollExists) {
       return res.status(404).send("enquente não existe ");
     }
-    const choices = await db.collection("choices").find().toArray();
+    const choices = await db.collection("choices").find({poolId: id}).toArray();
     res.status(200).send(choices);
   } catch (error) {
     console.log(error);
     res.status(500).send(`${error}`);
   }
+}
+
+export async function registerVote(req, res) {
+  const { id } = req.params;
+
+  try {
+    const choiceExists = await db
+      .collection("choices")
+      .findOne({ _id: objectId(id) });
+    if (!choiceExists) {
+      return res.status(404).send("opção não existe!");
+    }
+    const pollExists = await db
+      .collection("polls")
+      .findOne({ _id: objectId(choiceExists.poolId) });
+
+    if (pollExists.expireAt < dayjs().format("YYYY-MM-DD HH:mm")) {
+      return res.status(403).send("enquente expirada!!");
+    }
+    await db.collection("votes").insertOne({
+      createAt: dayjs().format("YYYY-MM-DD HH:mm"),
+      choiceId: objectId(id),
+    });
+    res.status(201).send("Opção registrada!");
+  } catch (error) {}
 }

@@ -52,7 +52,10 @@ export async function registerPoll(req, res) {
 }
 
 export async function getPoll(req, res) {
-  const polls = await db.collection("polls").find().toArray();
-
-  res.send(polls);
+  try {
+    const polls = await db.collection("polls").find().toArray();
+    res.send(polls);
+  } catch (error) {
+    res.sendStatus(500);
+  }
 }
