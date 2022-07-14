@@ -56,17 +56,19 @@ export async function registerChoice(req, res) {
 }
 
 export async function getChoice(req, res) {
-  const id = req.params.id;
-  const pollsExists = await db
-    .collection("polls")
-    .findOne({ _id: objectId(id) });
-  if (!pollsExists) {
-    return res.status(404).send("enquente não existe");
-  }
+  const { id } = req.params;
+
   try {
-    const choices = await db.collection("choices").find({poolId: objectId(id)}).toArray();
+    const pollsExists = await db
+      .collection("polls")
+      .findOne({ _id: objectId(id) });
+    if (!pollsExists) {
+      return res.status(404).send("enquente não existe ");
+    }
+    const choices = await db.collection("choices").find().toArray();
     res.status(200).send(choices);
   } catch (error) {
-    res.sendStatus(500);
+    console.log(error);
+    res.status(500).send(`${error}`);
   }
 }

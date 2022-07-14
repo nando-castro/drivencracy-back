@@ -8,6 +8,6 @@ router.post("/poll", registerPoll);
 router.post("/choice", registerChoice);
 
 router.get("/poll", getPoll);
-router.get("/choice/:id", getChoice);
+router.get("/poll/:id/choice", getChoice);
 
 export default router;
