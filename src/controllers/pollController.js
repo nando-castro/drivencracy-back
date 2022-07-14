@@ -59,3 +59,31 @@ export async function getPoll(req, res) {
     res.sendStatus(500);
   }
 }
+
+export async function getResult(req, res) {
+  const { id } = req.params;
+  try {
+    const pollExists = await db
+      .collection("polls")
+      .findOne({ _id: objectId(id) });
+    if (!pollExists) {
+      return res.status(404).send("enquente não existe ");
+    }
+    const choices = await db.collection("votes").aggregate([{ $group: { _id: "$choiceId", count: { $sum: 1 } } }]).toArray();
+    const arr = choices.sort(function (x, y) {
+      return y.count - x.count;
+    });
+    const choiceTop = await db.collection("choices").findOne({ _id: arr[0]._id });
+
+    const infos = {
+      _id: id,
+      title: pollExists.title,
+      expi: pollExists.expireAt,
+      result: { title: choiceTop.title, votes: arr[0].count },
+    };
+
+    res.status(200).send(infos);
+  } catch (error) {
+    res.status(500).send(`${error}`);
+  }
+}
