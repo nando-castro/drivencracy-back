@@ -1,15 +1,11 @@
 import dayjs from "dayjs";
 import { db, objectId } from "../db/mongodb.js";
-import joi from "joi";
 import dotenv from "dotenv";
+import choiceSchema from "../schemas/choiceSchemas/choiceSchema.js";
+
 dotenv.config();
 
 export async function registerChoice(req, res) {
-  const choiceSchema = joi.object({
-    title: joi.string().min(1).required(),
-    poolId: joi.string().required(),
-  });
-
   const choice = req.body;
   const { error } = choiceSchema.validate(choice);
 
@@ -35,23 +31,18 @@ export async function registerChoice(req, res) {
       .findOne({ _id: objectId(choice.poolId) });
 
     if (!pollExists) {
-      return res.status(404).send("Poll not exists!!");
+      return res.status(404).send("Enquete não existe!");
     }
     if (pollExists.expireAt < dayjs().format("YYYY-MM-DD HH:mm")) {
       return res.status(403).send("enquente expirada!!");
     }
-  } catch (error) {
-    res.status(500).send(`${error}`);
-  }
-
-  try {
     await db.collection("choices").insertOne({
       title: choice.title,
       poolId: choice.poolId,
     });
     res.sendStatus(201);
   } catch (error) {
-    res.sendStatus(500);
+    res.status(500).send(`${error}`);
   }
 }
 
@@ -65,7 +56,10 @@ export async function getChoice(req, res) {
     if (!pollExists) {
       return res.status(404).send("enquente não existe ");
     }
-    const choices = await db.collection("choices").find({poolId: id}).toArray();
+    const choices = await db
+      .collection("choices")
+      .find({ poolId: id })
+      .toArray();
     res.status(200).send(choices);
   } catch (error) {
     console.log(error);
